@@ -10,6 +10,7 @@ export type QueekErrorCode =
   | 'refresh_token_expired'
   | 'unauthenticated'
   | 'account_not_found'
+  | 'too_many_requests'
   | 'unknown_error';
 
 export interface StorageAdapter {
@@ -19,6 +20,7 @@ export interface StorageAdapter {
 }
 
 export interface QueekClientConfig {
+  // Use API base root (example: https://api.queek.com.ng/api/v1)
   baseUrl: string;
   clientKey: string;
   fetch?: typeof fetch;

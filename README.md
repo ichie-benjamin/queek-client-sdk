@@ -22,7 +22,7 @@ npm test
 import { createQueekClient } from '@queek/client-sdk';
 
 const client = createQueekClient({
-  baseUrl: 'https://api.queek.com.ng',
+  baseUrl: 'https://api.queek.com.ng/api/v1',
   clientKey: 'qck_client_public_key_here',
 });
 
@@ -30,10 +30,10 @@ await client.auth.requestOtp({ phone: '+14155552671' });
 await client.auth.verifyOtp({ phone: '+14155552671', otpCode: '1234' });
 await client.auth.me();
 
-await client.get('/api/v1/vendors/config/123');
-await client.post('/api/v1/orders', { vendor_id: '...' });
-await client.put('/api/v1/orders/123', { note: 'update' });
-await client.delete('/api/v1/orders/123');
+await client.get('/vendors/config/123');
+await client.post('/orders', { vendor_id: '...' });
+await client.put('/orders/123', { note: 'update' });
+await client.delete('/orders/123');
 
 await client.auth.logout();
 ```

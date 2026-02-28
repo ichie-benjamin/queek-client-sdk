@@ -70,7 +70,7 @@ test('attaches mandatory headers on auth requests', async () => {
   ], requests);
 
   const client = createQueekClient({
-    baseUrl: 'https://api.example.com',
+    baseUrl: 'https://api.example.com/api/v1',
     clientKey: 'public-key-abc',
     fetch,
   });
@@ -114,7 +114,7 @@ test('exposes client get/post/put/delete and sends auth header when token exists
   ], requests);
 
   const client = createQueekClient({
-    baseUrl: 'https://api.example.com',
+    baseUrl: 'https://api.example.com/api/v1',
     clientKey: 'public-key-abc',
     fetch,
   });
@@ -124,10 +124,10 @@ test('exposes client get/post/put/delete and sends auth header when token exists
     otpCode: '1234',
   });
 
-  await client.get('/api/v1/vendors');
-  await client.post('/api/v1/orders', { a: 1 });
-  await client.put('/api/v1/orders/1', { b: 2 });
-  await client.delete('/api/v1/orders/1');
+  await client.get('/vendors');
+  await client.post('/orders', { a: 1 });
+  await client.put('/orders/1', { b: 2 });
+  await client.delete('/orders/1');
 
   assert.equal(requests.length, 5);
 
@@ -171,7 +171,7 @@ test('auto-refreshes once on 401 and retries original request once', async () =>
   ], requests);
 
   const client = createQueekClient({
-    baseUrl: 'https://api.example.com',
+    baseUrl: 'https://api.example.com/api/v1',
     clientKey: 'public-key-abc',
     fetch,
   });
@@ -181,7 +181,7 @@ test('auto-refreshes once on 401 and retries original request once', async () =>
     otpCode: '1234',
   });
 
-  const response = await client.get('/api/v1/vendors');
+  const response = await client.get('/vendors');
 
   assert.equal(response.data.value, 1);
   assert.equal(requests.length, 4);
@@ -211,7 +211,7 @@ test('clears session and returns normalized auth error when refresh fails', asyn
   ], requests);
 
   const client = createQueekClient({
-    baseUrl: 'https://api.example.com',
+    baseUrl: 'https://api.example.com/api/v1',
     clientKey: 'public-key-abc',
     fetch,
   });
@@ -222,7 +222,7 @@ test('clears session and returns normalized auth error when refresh fails', asyn
   });
 
   await assert.rejects(
-    () => client.get('/api/v1/vendors'),
+    () => client.get('/vendors'),
     (error) => {
       assert.ok(error instanceof QueekSdkError);
       assert.equal(error.code, 'unauthenticated');
@@ -246,7 +246,7 @@ test('normalizes backend errors into QueekSdkError', async () => {
   ], requests);
 
   const client = createQueekClient({
-    baseUrl: 'https://api.example.com',
+    baseUrl: 'https://api.example.com/api/v1',
     clientKey: 'public-key-abc',
     fetch,
   });

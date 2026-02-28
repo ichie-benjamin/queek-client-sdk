@@ -1,7 +1,7 @@
 import { createQueekClient } from '../src/index.js';
 
 const client = createQueekClient({
-  baseUrl: 'https://api.queek.com.ng',
+  baseUrl: 'https://api.queek.com.ng/api/v1',
   clientKey: 'qck_client_public_key_here',
 });
 
@@ -23,7 +23,7 @@ async function run(): Promise<void> {
   const me = await client.auth.me();
   console.log('me -> user', me.user.id);
 
-  const storefrontHealth = await client.get<{ ok: boolean }>('/api/v1/storefront/health');
+  const storefrontHealth = await client.get<{ ok: boolean }>('/storefront/health');
   console.log('storefront health ->', storefrontHealth.data.ok);
 
   await client.auth.logout();

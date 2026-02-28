@@ -13,7 +13,7 @@ import type {
   VerifyOtpResponse,
 } from './types.js';
 
-const DEFAULT_AUTH_PREFIX = '/api/v1/client/auth';
+const DEFAULT_AUTH_PREFIX = '/client/auth';
 const DEFAULT_ACCESS_STORAGE_KEY = 'queek_client_access_token';
 const DEFAULT_REFRESH_STORAGE_KEY = 'queek_client_refresh_token';
 
@@ -189,8 +189,7 @@ export class QueekClientAuth {
     const normalized = path.toLowerCase().split('?')[0].replace(/\/+$/, '');
 
     return (
-      normalized.endsWith('/api/v1/client/auth/token/refresh') ||
-      normalized.endsWith('/v1/client/auth/token/refresh')
+      normalized.endsWith('/client/auth/token/refresh')
     );
   }
 
