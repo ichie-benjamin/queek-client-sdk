@@ -1,5 +1,5 @@
 {
-  "name": "@queek/client-sdk",
+  "name": "@queekai/client-sdk",
   "version": "0.1.0",
   "private": false,
   "description": "Official Queek storefront client SDK for auth and API requests.",

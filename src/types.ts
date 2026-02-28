@@ -22,7 +22,9 @@ export interface StorageAdapter {
 export interface QueekClientConfig {
   // Use API base root (example: https://api.queek.com.ng/api/v1)
   baseUrl: string;
-  clientKey: string;
+  clientKey?: string;
+  vendorSlug?: string;
+  mode?: 'auto' | 'hosted_storefront' | 'external_sdk';
   fetch?: typeof fetch;
   refreshTokenStorage?: StorageAdapter;
   accessTokenStorage?: StorageAdapter;

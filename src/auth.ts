@@ -35,9 +35,14 @@ export class QueekClientAuth {
       throw new Error('No fetch implementation available. Provide config.fetch in non-browser environments.');
     }
 
+    if (config.mode === 'external_sdk' && !config.clientKey) {
+      throw new Error('clientKey is required when mode is external_sdk.');
+    }
+
     this.http = new QueekHttpClient({
       baseUrl: config.baseUrl,
       clientKey: config.clientKey,
+      vendorSlug: config.vendorSlug,
       fetchFn,
     });
 

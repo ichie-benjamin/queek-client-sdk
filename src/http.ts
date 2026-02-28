@@ -16,7 +16,8 @@ export class QueekSdkError extends Error {
 
 export interface HttpClientConfig {
   baseUrl: string;
-  clientKey: string;
+  clientKey?: string;
+  vendorSlug?: string;
   fetchFn: typeof fetch;
 }
 
@@ -36,8 +37,13 @@ export class QueekHttpClient {
     const headers = new Headers(options.headers ?? {});
 
     headers.set('Accept', 'application/json');
-    headers.set('X-Client-Key', this.config.clientKey);
     headers.set('X-Platform', 'storefront');
+    if (this.config.clientKey) {
+      headers.set('X-Client-Key', this.config.clientKey);
+    }
+    if (this.config.vendorSlug) {
+      headers.set('X-Vendor-Slug', this.config.vendorSlug);
+    }
 
     if (options.body !== undefined) {
       headers.set('Content-Type', 'application/json');

@@ -72,6 +72,7 @@ test('attaches mandatory headers on auth requests', async () => {
   const client = createQueekClient({
     baseUrl: 'https://api.example.com/api/v1',
     clientKey: 'public-key-abc',
+    vendorSlug: 'vendor-one',
     fetch,
   });
 
@@ -79,8 +80,50 @@ test('attaches mandatory headers on auth requests', async () => {
 
   assert.equal(requests.length, 1);
   assert.equal(requests[0].headers.get('x-client-key'), 'public-key-abc');
+  assert.equal(requests[0].headers.get('x-vendor-slug'), 'vendor-one');
   assert.equal(requests[0].headers.get('x-platform'), 'storefront');
   assert.equal(requests[0].headers.get('accept'), 'application/json');
+});
+
+test('supports hosted storefront mode without client key', async () => {
+  const requests = [];
+  const fetch = makeFetch([
+    jsonResponse(200, {
+      status: 'success',
+      message: 'ok',
+      data: {
+        next_action: 'verify_otp',
+        phone: '+14155552671',
+        user_exists: true,
+        expires_in: 120,
+        resend_in: 120,
+      },
+    }),
+  ], requests);
+
+  const client = createQueekClient({
+    baseUrl: 'https://api.example.com/api/v1',
+    vendorSlug: 'vendor-hosted',
+    mode: 'hosted_storefront',
+    fetch,
+  });
+
+  await client.auth.requestOtp({ phone: '+14155552671' });
+
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0].headers.get('x-client-key'), null);
+  assert.equal(requests[0].headers.get('x-vendor-slug'), 'vendor-hosted');
+  assert.equal(requests[0].headers.get('x-platform'), 'storefront');
+});
+
+test('requires client key in external sdk mode', async () => {
+  assert.throws(
+    () => createQueekClient({
+      baseUrl: 'https://api.example.com/api/v1',
+      mode: 'external_sdk',
+    }),
+    /clientKey is required when mode is external_sdk/,
+  );
 });
 
 test('exposes client get/post/put/delete and sends auth header when token exists', async () => {
