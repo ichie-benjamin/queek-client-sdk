@@ -25,14 +25,12 @@ import { createQueekClient } from '@queekai/client-sdk';
 const client = createQueekClient({
   baseUrl: 'https://api.queek.com.ng/api/v1',
   clientKey: 'qck_client_public_key_here',
-  mode: 'external_sdk',
 });
 
 // Queek-hosted storefront (key optional)
 const hostedClient = createQueekClient({
   baseUrl: 'https://api.queek.com.ng/api/v1',
   vendorSlug: 'jonshop',
-  mode: 'hosted_storefront',
 });
 
 await client.auth.requestOtp({ phone: '+14155552671' });
