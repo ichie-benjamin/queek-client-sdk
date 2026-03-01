@@ -10,7 +10,7 @@ import type {
 export interface QueekClientInstance {
   auth: Pick<
     QueekClientAuth,
-    'requestOtp' | 'verifyOtp' | 'refresh' | 'me' | 'logout' | 'isAuthenticated' | 'getAccessToken'
+    'requestOtp' | 'verifyOtp' | 'register' | 'refresh' | 'me' | 'logout' | 'isAuthenticated' | 'getAccessToken'
   >;
   get<T>(path: string, options?: QueekRequestOptions): Promise<ApiEnvelope<T>>;
   post<T>(path: string, body: unknown, options?: QueekRequestOptions): Promise<ApiEnvelope<T>>;
@@ -45,6 +45,8 @@ export type {
   ApiEnvelope,
   ClientAuthUser,
   MeResponse,
+  RegisterPayload,
+  RegisterResponse,
   QueekChannel,
   QueekClientConfig,
   QueekErrorCode,

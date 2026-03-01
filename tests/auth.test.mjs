@@ -126,6 +126,40 @@ test('requires client key in external sdk mode', async () => {
   );
 });
 
+test('binds global fetch fallback to globalThis when config.fetch is omitted', async () => {
+  const originalFetch = globalThis.fetch;
+  const requests = [];
+
+  globalThis.fetch = async function patchedFetch(url, init = {}) {
+    assert.equal(this, globalThis);
+    requests.push({ url, init });
+
+    return jsonResponse(200, {
+      status: 'success',
+      message: 'ok',
+      data: {
+        next_action: 'verify_otp',
+        phone: '+14155552671',
+        user_exists: true,
+        expires_in: 120,
+        resend_in: 120,
+      },
+    });
+  };
+
+  try {
+    const client = createQueekClient({
+      baseUrl: 'https://api.example.com/api/v1',
+      clientKey: 'public-key-abc',
+    });
+
+    await client.auth.requestOtp({ phone: '+14155552671' });
+    assert.equal(requests.length, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test('exposes client get/post/put/delete and sends auth header when token exists', async () => {
   const requests = [];
   const fetch = makeFetch([
@@ -184,6 +218,52 @@ test('exposes client get/post/put/delete and sends auth header when token exists
   assert.equal(requests[2].init.method, 'POST');
   assert.equal(requests[3].init.method, 'PUT');
   assert.equal(requests[4].init.method, 'DELETE');
+});
+
+test('supports auth.register and persists returned token pair', async () => {
+  const requests = [];
+  const fetch = makeFetch([
+    jsonResponse(200, {
+      status: 'success',
+      message: 'Account created',
+      data: tokenData('register-access-1', 'register-refresh-1'),
+    }),
+    jsonResponse(200, {
+      status: 'success',
+      message: 'ok',
+      data: { user: { id: 'user-1' } },
+    }),
+  ], requests);
+
+  const client = createQueekClient({
+    baseUrl: 'https://api.example.com/api/v1',
+    clientKey: 'public-key-abc',
+    fetch,
+  });
+
+  const register = await client.auth.register({
+    firstName: 'Client',
+    lastName: 'User',
+    email: 'client@example.com',
+    phone: '+14155552671',
+    otpCode: '1234',
+  });
+
+  assert.equal(register.access_token, 'register-access-1');
+  assert.equal(client.auth.getAccessToken(), 'register-access-1');
+
+  await client.auth.me();
+
+  assert.equal(requests[0].url, 'https://api.example.com/api/v1/client/auth/register');
+
+  const registerBody = JSON.parse(requests[0].init.body);
+  assert.equal(registerBody.first_name, 'Client');
+  assert.equal(registerBody.last_name, 'User');
+  assert.equal(registerBody.email, 'client@example.com');
+  assert.equal(registerBody.phone, '+14155552671');
+  assert.equal(registerBody.otp_code, '1234');
+
+  assert.equal(requests[1].headers.get('authorization'), 'Bearer register-access-1');
 });
 
 test('auto-refreshes once on 401 and retries original request once', async () => {

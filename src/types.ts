@@ -2,6 +2,8 @@ export type QueekChannel = 'sms' | 'whatsapp';
 
 export type QueekErrorCode =
   | 'invalid_phone'
+  | 'invalid_email'
+  | 'invalid_username'
   | 'otp_send_failed'
   | 'invalid_otp'
   | 'expired_otp'
@@ -10,6 +12,8 @@ export type QueekErrorCode =
   | 'refresh_token_expired'
   | 'unauthenticated'
   | 'account_not_found'
+  | 'account_already_exists'
+  | 'account_not_allowed'
   | 'too_many_requests'
   | 'unknown_error';
 
@@ -46,6 +50,17 @@ export interface VerifyOtpPayload {
   platform?: string;
 }
 
+export interface RegisterPayload {
+  firstName: string;
+  lastName?: string;
+  email: string;
+  phone: string;
+  countryCode?: string;
+  otpCode: string;
+  username?: string;
+  platform?: string;
+}
+
 export interface ClientAuthUser {
   id: string;
   first_name: string | null;
@@ -78,6 +93,7 @@ export interface RequestOtpResponse {
 }
 
 export type VerifyOtpResponse = TokenPayload & { user: ClientAuthUser };
+export type RegisterResponse = TokenPayload & { user: ClientAuthUser };
 export type RefreshResponse = TokenPayload & { user: ClientAuthUser };
 export type MeResponse = { user: ClientAuthUser };
 

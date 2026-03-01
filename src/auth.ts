@@ -6,6 +6,8 @@ import type {
   QueekClientConfig,
   QueekRequestConfig,
   QueekRequestOptions,
+  RegisterPayload,
+  RegisterResponse,
   RefreshResponse,
   RequestOtpPayload,
   RequestOtpResponse,
@@ -27,9 +29,10 @@ export class QueekClientAuth {
 
   private accessToken: string | null;
   private refreshToken: string | null;
+  private refreshPromise: Promise<RefreshResponse> | null = null;
 
   constructor(config: QueekClientConfig) {
-    const fetchFn = config.fetch ?? globalThis.fetch;
+    const fetchFn = config.fetch ?? globalThis.fetch?.bind(globalThis);
 
     if (!fetchFn) {
       throw new Error('No fetch implementation available. Provide config.fetch in non-browser environments.');
@@ -117,8 +120,25 @@ export class QueekClientAuth {
     return response.data;
   }
 
+  async register(payload: RegisterPayload): Promise<RegisterResponse> {
+    const response = await this.post<RegisterResponse>(`${DEFAULT_AUTH_PREFIX}/register`, {
+      first_name: payload.firstName,
+      last_name: payload.lastName,
+      email: payload.email,
+      phone: payload.phone,
+      country_code: payload.countryCode,
+      otp_code: payload.otpCode,
+      username: payload.username,
+      platform: payload.platform ?? this.platform,
+    });
+
+    this.persistTokens(response.data.access_token, response.data.refresh_token);
+
+    return response.data;
+  }
+
   async refresh(): Promise<RefreshResponse> {
-    return this.refreshInternal();
+    return this.refreshWithLock();
   }
 
   async me(): Promise<MeResponse> {
@@ -129,13 +149,14 @@ export class QueekClientAuth {
 
   async logout(): Promise<void> {
     const refreshToken = this.refreshToken;
-
-    await this.post<Record<string, never>>(
-      `${DEFAULT_AUTH_PREFIX}/logout`,
-      refreshToken ? { refresh_token: refreshToken } : {},
-    );
-
-    this.clearTokens();
+    try {
+      await this.post<Record<string, never>>(
+        `${DEFAULT_AUTH_PREFIX}/logout`,
+        refreshToken ? { refresh_token: refreshToken } : {},
+      );
+    } finally {
+      this.clearTokens();
+    }
   }
 
   isAuthenticated(): boolean {
@@ -161,7 +182,7 @@ export class QueekClientAuth {
       }
 
       try {
-        await this.refreshInternal();
+        await this.refreshWithLock();
       } catch (refreshError) {
         this.clearTokens();
         throw this.toNormalizedAuthError(refreshError);
@@ -216,6 +237,18 @@ export class QueekClientAuth {
     this.persistTokens(response.data.access_token, response.data.refresh_token);
 
     return response.data;
+  }
+
+  private async refreshWithLock(): Promise<RefreshResponse> {
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.refreshPromise = this.refreshInternal().finally(() => {
+      this.refreshPromise = null;
+    });
+
+    return this.refreshPromise;
   }
 
   private toNormalizedAuthError(cause: unknown): QueekSdkError {

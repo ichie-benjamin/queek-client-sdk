@@ -19,7 +19,7 @@ npm test
 ## Usage
 
 ```ts
-import { createQueekClient } from '@queekai/client-sdk';
+import { createQueekClient, QueekSdkError } from '@queekai/client-sdk';
 
 // External self-hosted storefront (requires client key)
 const client = createQueekClient({
@@ -34,7 +34,21 @@ const hostedClient = createQueekClient({
 });
 
 await client.auth.requestOtp({ phone: '+14155552671' });
-await client.auth.verifyOtp({ phone: '+14155552671', otpCode: '1234' });
+try {
+  await client.auth.verifyOtp({ phone: '+14155552671', otpCode: '1234' });
+} catch (error) {
+  if (error instanceof QueekSdkError && error.code === 'account_not_found') {
+    await client.auth.register({
+      firstName: 'Client',
+      lastName: 'User',
+      email: 'client@example.com',
+      phone: '+14155552671',
+      otpCode: '1234',
+    });
+  } else {
+    throw error;
+  }
+}
 await client.auth.me();
 
 await client.get('/client/store/info');
