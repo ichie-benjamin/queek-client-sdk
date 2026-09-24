@@ -75,3 +75,7 @@ await client.auth.logout();
 - Sends `Authorization: Bearer <token>` when access token exists
 - On `401`, refreshes once and retries the original request once
 - If refresh fails, clears tokens and throws normalized auth error (`unauthenticated`)
+
+## License
+
+MIT — see [LICENSE](LICENSE).

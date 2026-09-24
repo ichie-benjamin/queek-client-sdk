@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "private": false,
   "description": "Official Queek storefront client SDK for auth and API requests.",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
