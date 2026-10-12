@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 - 2026-10-12
 
 Source brought back in line with the published 0.3.1 and extended. All changes are additive.
 
