@@ -2,6 +2,8 @@
 
 ## 0.4.0 - 2026-10-12
 
+The package moves to the Queek scope: install `@usequeek/client-sdk`. It was `@queekai/client-sdk` up to 0.3.1, which is deprecated and will not receive updates.
+
 Source brought back in line with the published 0.3.1 and extended. All changes are additive.
 
 - Email one-time-password sign-in: `emailRequestOtp`, `emailVerifyOtp`, `emailRegisterOtp`.

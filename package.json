@@ -1,5 +1,5 @@
 {
-  "name": "@queekai/client-sdk",
+  "name": "@usequeek/client-sdk",
   "version": "0.4.0",
   "private": false,
   "description": "Official Queek Storefront API client: customer sign-in, self-renewing sessions, retries, idempotency keys and pagination.",

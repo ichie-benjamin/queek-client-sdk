@@ -9,15 +9,17 @@ The SDK does not model each endpoint. You pass a path from the [Storefront API r
 ## Install
 
 ```bash
-npm install @queekai/client-sdk
+npm install @usequeek/client-sdk
 ```
+
+This package was published as `@queekai/client-sdk` up to 0.3.1. The API is unchanged; switch the package name in your `package.json` and imports.
 
 ## Quickstart
 
 Create a key in the Queek dashboard under **Settings, API keys**. Use a `pk_` public key in browser code. Use an `sk_` private key only on a server.
 
 ```ts
-import { createQueekClient } from '@queekai/client-sdk';
+import { createQueekClient } from '@usequeek/client-sdk';
 
 const client = createQueekClient({
   baseUrl: 'https://client.usequeek.com/v1',
@@ -40,7 +42,7 @@ for await (const product of client.paginate<{ name: string }>('/store/products',
 Sign-in uses a one-time password sent by SMS, WhatsApp or email. On success the SDK keeps the tokens and attaches them to every later request.
 
 ```ts
-import { QueekSdkError } from '@queekai/client-sdk';
+import { QueekSdkError } from '@usequeek/client-sdk';
 
 await client.auth.requestOtp({ phone: '+14155552671', channel: 'sms' });
 
