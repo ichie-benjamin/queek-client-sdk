@@ -1,0 +1,48 @@
+name: Publish
+
+# Tags are the release: bump package.json, commit, then `git tag v0.4.1 && git push origin master --tags`.
+# The workflow re-runs every gate, then publishes the exact source it verified.
+# Publishes through npm trusted publishing (OIDC): no token is stored.
+# The package's Trusted Publisher on npmjs.com names this workflow file.
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run lint
+
+      - name: Build and test
+        run: npm test
+
+      - name: Tag matches package.json
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          pkg_version="$(node -p "require('./package.json').version")"
+          if [ "$tag_version" != "$pkg_version" ]; then
+            echo "::error::tag is v${tag_version} but package.json says ${pkg_version}: bump, commit, re-tag."
+            exit 1
+          fi
+
+      - name: Publish
+        run: npm publish --provenance --access public

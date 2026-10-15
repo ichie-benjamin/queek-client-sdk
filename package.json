@@ -15,7 +15,7 @@
   "homepage": "https://docs.usequeek.com/docs/storefront",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ichie-benjamin/queek-client-sdk.git"
+    "url": "git+https://github.com/usequeek/client-sdk.git"
   },
   "bugs": {
     "email": "developers@usequeek.com"
